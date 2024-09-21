@@ -9,7 +9,7 @@ pendown()
 
 speed(20)
 bgcolor("black")
-hh = 0
+h = 0
 
 penup()
 goto(-12, -80)
