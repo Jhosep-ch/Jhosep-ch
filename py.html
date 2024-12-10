@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe: Aplicación de la Teoría de Grafos en Redes Sociales</title>
+</head>
+<body>
+    <header>
+        <h1>UNIVERSIDAD TECNOLÓGICA DEL PERÚ</h1>
+        <h2>Curso: Matemática Discreta</h2>
+        <h3>Trabajo Final: Aplicación de la Teoría de Grafos para Identificar Grupos en Redes Sociales Utilizando Matrices de Adyacencia, Listas de Adyacencia y Grafos Conexos y No Conexos</h3>
+        <p>Sección: [Sección]</p>
+        <p>Estudiante: [Nombre del estudiante]</p>
+        <p>Código de estudiante: [Código]</p>
+    </header>
+
+    <section>
+        <h2>Introducción</h2>
+        <p>Las redes sociales modernas se pueden modelar como grafos donde los usuarios son nodos y las interacciones entre ellos (como "seguimiento", "me gusta", comentarios) son las aristas. A través del análisis de estos grafos, es posible identificar <strong>grupos</strong> de usuarios conectados y estudiar su estructura. Este informe explora cómo se pueden utilizar conceptos clave de la teoría de grafos, como las <strong>matrices de adyacencia</strong>, <strong>listas de adyacencia</strong>, y la distinción entre <strong>grafos conexos y no conexos</strong>, para identificar comunidades dentro de una red social.</p>
+    </section>
+
+    <section>
+        <h2>Objetivos</h2>
+        <h3>Objetivo General</h3>
+        <p>Aplicar la teoría de grafos y sus representaciones (matrices de adyacencia, listas de adyacencia) para identificar grupos dentro de redes sociales, utilizando los conceptos de grafos conexos y no conexos.</p>
+        <h3>Objetivos Específicos</h3>
+        <ul>
+            <li>Definir los conceptos de <strong>matrices de adyacencia</strong>, <strong>listas de adyacencia</strong> y su aplicación en redes sociales.</li>
+            <li>Explicar las diferencias entre <strong>grafos conexos y no conexos</strong> y cómo se utilizan para analizar la conectividad en redes sociales.</li>
+            <li>Aplicar los conceptos de teoría de grafos para identificar <strong>grupos de usuarios</strong> y la propagación de la influencia dentro de una red social.</li>
+            <li>Analizar cómo estos enfoques ayudan en la segmentación de audiencias y en el descubrimiento de comunidades influyentes en redes sociales.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Cuerpo de la Investigación</h2>
+
+        <h3>Descripción de la Aplicación</h3>
+        <p>Los grafos se utilizan para representar redes sociales donde los <strong>nodos</strong> son usuarios y las <strong>aristas</strong> son las interacciones entre ellos. La teoría de grafos ayuda a entender cómo los usuarios están conectados, permitiendo la identificación de <strong>grupos</strong> o <strong>comunidades</strong> dentro de la red. Los principales tipos de representaciones de grafos son:</p>
+        <ul>
+            <li><strong>Matrices de Adyacencia</strong>: Una matriz que representa las conexiones entre los nodos de un grafo.</li>
+            <li><strong>Matrices de Incidencia</strong>: Representan las conexiones entre nodos y aristas.</li>
+            <li><strong>Listas de Adyacencia</strong>: Cada nodo tiene una lista de sus nodos adyacentes.</li>
+            <li><strong>Grafos Conexos y No Conexos</strong>: Los grafos conexos permiten identificar grupos de usuarios que están completamente conectados, mientras que los no conexos pueden revelar subgrupos aislados dentro de la red.</li>
+        </ul>
+
+        <h3>Conceptos Teóricos y Aplicaciones</h3>
+        <h4>Grafos</h4>
+        <p><strong>Definición:</strong> Un grafo es una estructura matemática que consiste en nodos (vértices) conectados por aristas (bordes).</p>
+        <ul>
+            <li><strong>Dirigidos</strong>: Las aristas tienen una dirección (por ejemplo, "me gusta" en redes sociales).</li>
+            <li><strong>No dirigidos</strong>: Las interacciones no tienen dirección (por ejemplo, amistades mutuas).</li>
+            <li><strong>Pesados</strong>: Las aristas tienen un peso que puede representar la fuerza de la conexión (por ejemplo, el número de mensajes enviados entre dos usuarios).</li>
+        </ul>
+
+        <h4>Matrices de Adyacencia</h4>
+        <p><strong>Definición:</strong> Es una matriz cuadrada donde las filas y columnas representan los nodos del grafo. Si hay una conexión entre dos nodos, se coloca un valor (usualmente 1) en la posición correspondiente de la matriz.</p>
+        <p><strong>Ejemplo de una matriz de adyacencia:</strong></p>
+        <pre>
+             A   B   C   D
+        A [ 0,  1,  0,  0 ]
+        B [ 1,  0,  1,  0 ]
+        C [ 0,  1,  0,  1 ]
+        D [ 0,  0,  1,  0 ]
+        </pre>
+
+        <h4>Matrices de Incidencia</h4>
+        <p><strong>Definición:</strong> En una matriz de incidencia, las filas representan los nodos y las columnas las aristas. El valor en la intersección indica si un nodo está conectado a una arista (por ejemplo, 1 si está conectado, 0 si no lo está).</p>
+        <pre>
+             e1  e2  e3
+        A [ 1,  0,  0 ]
+        B [ 1,  1,  0 ]
+        C [ 0,  1,  1 ]
+        D [ 0,  0,  1 ]
+        </pre>
+
+        <h4>Listas de Adyacencia</h4>
+        <p><strong>Definición:</strong> Una lista de adyacencia es una representación en la que cada nodo tiene una lista de sus nodos vecinos o adyacentes.</p>
+        <pre>
+        A: [B]
+        B: [A, C]
+        C: [B, D]
+        D: [C]
+        </pre>
+    </section>
+
+    <section>
+        <h2>Impactos de la Aplicación (FODA)</h2>
+        <h3>Fortalezas</h3>
+        <ul>
+            <li><strong>Optimización del análisis de redes sociales</strong>: Permite identificar comunidades bien conectadas, facilitando la segmentación de audiencias para marketing.</li>
+            <li><strong>Eficiencia en la representación</strong>: Las matrices y listas de adyacencia son representaciones eficientes, especialmente para redes grandes.</li>
+        </ul>
+
+        <h3>Oportunidades</h3>
+        <ul>
+            <li><strong>Mejor comprensión de la influencia social</strong>: Al identificar grafos conexos, se pueden hallar los nodos más influyentes dentro de una comunidad.</li>
+            <li><strong>Aplicación en marketing dirigido</strong>: Análisis de grafos para mejorar las campañas publicitarias, dirigiéndolas a usuarios claves en la red.</li>
+        </ul>
+
+        <h3>Debilidades</h3>
+        <ul>
+            <li><strong>Requiere grandes volúmenes de datos</strong>: El análisis de grandes redes sociales puede ser costoso en términos computacionales.</li>
+            <li><strong>Complejidad en la implementación</strong>: Las matrices y listas de adyacencia pueden volverse complicadas para grafos muy grandes o dinámicos.</li>
+        </ul>
+
+        <h3>Riesgos</h3>
+        <ul>
+            <li><strong>Falta de precisión en los datos</strong>: La calidad de los resultados depende de la precisión de los datos de interacción entre usuarios.</li>
+            <li><strong>Riesgos de privacidad</strong>: El análisis de redes sociales puede poner en riesgo la privacidad de los usuarios si no se manejan adecuadamente los datos.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Conclusiones</h2>
+        <ul>
+            <li>La teoría de grafos es una herramienta poderosa para el análisis de redes sociales y la identificación de grupos de usuarios.</li>
+            <li>Las matrices de adyacencia, listas de adyacencia y grafos conexos son fundamentales para entender la conectividad y la influencia en las redes sociales.</li>
+            <li>A través del análisis de grafos, se pueden identificar comunidades de usuarios influyentes y mejorar las estrategias de marketing dirigidas.</li>
+            <li>Aunque los grafos ofrecen ventajas significativas, los desafíos de manejar grandes redes sociales y garantizar la privacidad siguen siendo factores a considerar.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Fuentes Bibliográficas</h2>
+        <ul>
+            <li>Newman, M. E. J. (2010). Networks: An Introduction. Oxford University Press.</li>
+            <li>Wasserman, S., & Faust, K. (1994). Social Network Analysis: Methods and Applications. Cambridge University Press.</li>
+            <li>Cohen, W. W., & Korba, S. (2016). Social Network Analysis: Methods and Applications. Springer.</li>
+        </ul>
+    </section>
+</body>
+</html>
