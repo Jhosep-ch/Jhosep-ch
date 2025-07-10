@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GesPharma - Sistema de Gestión para Farmacias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar {
+            transition: all 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .notification {
+            animation: slideIn 0.5s forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-content {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 md:shadow transform -translate-x-full md:translate-x-0 fixed h-full overflow-y-auto z-50 no-print">
+        <div class="p-4 flex items-center border-b border-gray-200">
+            <img src="https://placehold.co/40x40" alt="Logo GesPharma - Pastilla azul con cruz blanca" class="h-10 w-10 rounded-full mr-3">
+            <h1 class="text-xl font-bold text-blue-500">GesPharma</h1>
+        </div>
+        <nav class="mt-4">
+            <div class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Principal</div>
+            <a href="#" id="dashboardBtn" class="block px-4 py-2 text-blue-600 bg-blue-50 rounded mx-2">
+                <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+            </a>
+            <a href="#" id="salesBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-shopping-cart mr-3"></i>Ventas
+            </a>
+            <a href="#" id="inventoryBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-warehouse mr-3"></i>Inventario
+            </a>
+            <a href="#" id="productsBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-pills mr-3"></i>Productos
+            </a>
+            <div class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Operaciones</div>
+            <a href="#" id="suppliersBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-truck mr-3"></i>Proveedores
+            </a>
+            <a href="#" id="prescriptionsBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-file-prescription mr-3"></i>Recetas
+            </a>
+            <div class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Reportes</div>
+            <a href="#" id="reportsBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-chart-bar mr-3"></i>Estadísticas
+            </a>
+            <div class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Configuración</div>
+            <a href="#" id="usersBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-users mr-3"></i>Usuarios
+            </a>
+            <a href="#" id="settingsBtn" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 rounded mx-2">
+                <i class="fas fa-cog mr-3"></i>Ajustes
+            </a>
+        </nav>
+        <div class="absolute bottom-0 w-full p-4 border-t border-gray-200">
+            <div class="flex items-center">
+                <img src="https://placehold.co/40x40" alt="Foto de perfil del usuario - Persona profesional con bata blanca" class="h-10 w-10 rounded-full mr-3">
+                <div>
+                    <p class="font-semibold text-gray-800">Dra. María Gómez</p>
+                    <p class="text-xs text-gray-500">Administrador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden md:ml-64">
+        <!-- Top Navigation -->
+        <header class="bg-white shadow-sm z-40 no-print">
+            <div class="flex justify-between items-center p-4">
+                <div class="flex items-center md:hidden">
+                    <button id="mobileMenuBtn" class="text-gray-500 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <div class="flex-1 text-center md:text-left ml-4">
+                    <h2 id="pageTitle" class="text-lg font-semibold text-gray-800">Dashboard</h2>
+                </div>
+                <div class="flex items-center">
+                    <div class="relative mr-4">
+                        <input type="text" placeholder="Buscar..." class="border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button class="p-2 text-gray-500 rounded-full hover:bg-gray-100">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+            <!-- Dashboard Content -->
+            <div id="dashboardContent" class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Total Ventas Hoy</p>
+                                <p class="text-3xl font-bold text-blue-600">S/ 2,845.50</p>
+                                <p class="text-sm text-green-600"><i class="fas fa-arrow-up"></i> 12% más que ayer</p>
+                            </div>
+                            <div class="bg-blue-100 p-4 rounded-full">
+                                <i class="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Productos Stock Bajo</p>
+                                <p class="text-3xl font-bold text-red-600">18</p>
+                                <p class="text-sm text-red-600"><i class="fas fa-exclamation-triangle"></i> Requiere atención</p>
+                            </div>
+                            <div class="bg-red-100 p-4 rounded-full">
+                                <i class="fas fa-box-open text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Productos próximo a vencer</p>
+                                <p class="text-3xl font-bold text-orange-500">9</p>
+                                <p class="text-sm text-orange-500"><i class="fas fa-calendar-times"></i> 30 días próximos</p>
+                            </div>
+                            <div class="bg-orange-100 p-4 rounded-full">
+                                <i class="fas fa-hourglass-half text-orange-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">Ventas Recientes</h3>
+                            <a href="#" class="text-blue-500 text-sm">Ver todas</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-900">F001-000045</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">10:25 AM</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 85.90</td>
+                                        <td class="px-4 py-2 text-sm text-green-600">Pagado</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-900">F001-000044</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">09:48 AM</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 128.50</td>
+                                        <td class="px-4 py-2 text-sm text-green-600">Pagado</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm text-gray-900">F001-000043</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">09:12 AM</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 42.30</td>
+                                        <td class="px-4 py-2 text-sm text-green-600">Pagado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">Productos más vendidos</h3>
+                            <a href="#" class="text-blue-500 text-sm">Ver reporte</a>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 flex-shrink-0">
+                                    <img src="https://placehold.co/40x40" alt="Ibuprofeno 600mg - Caja azul con pastillas" class="h-full w-full rounded">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-medium">Ibuprofeno 600mg</h4>
+                                        <span class="text-xs text-gray-500">12 ventas</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 flex-shrink-0">
+                                    <img src="https://placehold.co/40x40" alt="Paracetamol 500mg - Envase amarillo con pastillas blancas" class="h-full w-full rounded">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-medium">Paracetamol 500mg</h4>
+                                        <span class="text-xs text-gray-500">9 ventas</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 flex-shrink-0">
+                                    <img src="https://placehold.co/40x40" alt="Jabón antibacterial - Botella verde con líquido" class="h-full w-full rounded">
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-medium">Jabón Antibacterial</h4>
+                                        <span class="text-xs text-gray-500">6 ventas</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Inventario por vencer (30 días)</h3>
+                        <button id="showExpiryModal" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">Ver detalles</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vence</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Aspirina 100mg - Blister rojo con pastillas blancas" class="h-8 w-8 rounded-full mr-2">
+                                        <div>
+                                            Aspirina 100mg
+                                            <p class="text-xs text-gray-500">Bayer</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">L23456</td>
+                                    <td class="px-4 py-2 text-sm text-red-600">15/07/2023</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">25 unidades</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Amoxicilina 500mg - Caja azul con frasco" class="h-8 w-8 rounded-full mr-2">
+                                        <div>
+                                            Amoxicilina 500mg
+                                            <p class="text-xs text-gray-500">Genérico</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">L98765</td>
+                                    <td class="px-4 py-2 text-sm text-orange-500">22/07/2023</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">15 frascos</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Jarabe para la tos - Frasco ámbar con líquido rojo" class="h-8 w-8 rounded-full mr-2">
+                                        <div>
+                                            Jarabe para la Tos
+                                            <p class="text-xs text-gray-500">Tosaliv</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">L11223</td>
+                                    <td class="px-4 py-2 text-sm text-orange-500">28/07/2023</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">8 unidades</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Content -->
+            <div id="salesContent" class="p-6 hidden">
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-lg">Punto de Venta</h3>
+                        <div class="flex space-x-2">
+                            <button id="newSaleBtn" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                <i class="fas fa-plus mr-1"></i> Nueva Venta
+                            </button>
+                            <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200">
+                                <i class="fas fa-history mr-1"></i> Historial
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="flex mb-4">
+                                        <div class="flex-1 mr-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar producto</label>
+                                            <div class="relative">
+                                                <input type="text" id="productSearch" placeholder="Nombre o código de barras" class="border rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                <i class="fas fa-barcode absolute left-3 top-3 text-gray-400"></i>
+                                                <button id="scanBarcodeBtn" class="absolute right-3 top-3 text-gray-400 hover:text-blue-500">
+                                                    <i class="fas fa-camera"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="w-24">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                                            <input type="number" min="1" value="1" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="searchResults" class="hidden">
+                                        <div class="border rounded-lg max-h-60 overflow-y-auto">
+                                            <div class="p-2 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 flex items-center">
+                                                <img src="https://placehold.co/40x40" alt="Paracetamol 500mg - Blister con pastillas" class="h-8 w-8 rounded mr-2">
+                                                <div class="flex-1">
+                                                    <p class="font-medium">Paracetamol 500mg</p>
+                                                    <p class="text-xs text-gray-500">Código: 7891234567890</p>
+                                                </div>
+                                                <p class="font-medium text-blue-600">S/ 8.90</p>
+                                            </div>
+                                            <div class="p-2 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 flex items-center">
+                                                <img src="https://placehold.co/40x40" alt="Ibuprofeno 400mg - Caja con blisters" class="h-8 w-8 rounded mr-2">
+                                                <div class="flex-1">
+                                                    <p class="font-medium">Ibuprofeno 400mg</p>
+                                                    <p class="text-xs text-gray-500">Código: 7899876543210</p>
+                                                </div>
+                                                <p class="font-medium text-blue-600">S/ 12.50</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <h4 class="font-medium text-gray-700 mb-2">Lista de venta</h4>
+                                        <div class="border rounded-lg overflow-hidden">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cant.</th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">P.Unit.</th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                    <tr>
+                                                        <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                                            <i class="fas fa-plus-circle text-blue-500 mr-2 cursor-pointer"></i>
+                                                            <div>
+                                                                <p class="text-sm">Paracetamol 500mg</p>
+                                                                <p class="text-xs text-gray-500">Genérico</p>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-2 text-sm text-gray-900">
+                                                            <div class="flex items-center">
+                                                                <button class="text-gray-500 px-1 py-1 rounded focus:outline-none">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                                <input type="number" min="1" value="2" class="w-12 text-center border rounded mx-1 py-1">
+                                                                <button class="text-gray-500 px-1 py-1 rounded focus:outline-none">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-2 text-sm text-gray-900">S/ 8.90</td>
+                                                        <td class="px-4 py-2 text-sm font-medium text-blue-600">S/ 17.80</td>
+                                                        <td class="px-4 py-2 text-sm text-gray-900">
+                                                            <button class="text-red-500 hover:text-red-700">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <h4 class="font-medium text-gray-700 mb-4">Resumen de Venta</h4>
+                                    <div class="space-y-3 mb-4">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Subtotal:</span>
+                                            <span>S/ 17.80</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">IGV (18%):</span>
+                                            <span>S/ 3.20</span>
+                                        </div>
+                                        <div class="border-t pt-2">
+                                            <div class="flex justify-between font-semibold">
+                                                <span>Total:</span>
+                                                <span>S/ 21.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Método de pago</label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button class="border rounded-lg py-2 px-2 text-center hover:bg-blue-50 hover:border-blue-300">
+                                                <i class="fas fa-money-bill-wave text-green-500"></i>
+                                                <p class="text-xs">Efectivo</p>
+                                            </button>
+                                            <button class="border rounded-lg py-2 px-2 text-center hover:bg-blue-50 hover:border-blue-300">
+                                                <i class="fas fa-credit-card text-blue-500"></i>
+                                                <p class="text-xs">Tarjeta</p>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                                        <select class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option>Cliente ocasional</option>
+                                            <option>DNI - 76543210</option>
+                                            <option>DNI - 87654321</option>
+                                            <option>RUC - 20123456789</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button id="completeSaleBtn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 flex items-center justify-center">
+                                        <i class="fas fa-check-circle mr-2"></i> Completar Venta
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-lg">Facturas recientes</h3>
+                        <div class="flex">
+                            <input type="date" class="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                <i class="fas fa-filter mr-1"></i> Filtrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha/Hora</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-blue-600 underline cursor-pointer">F001-000045</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">15/06/2023 - 10:25 AM</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">Cliente ocasional</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 85.90</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Pagado</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                        <button class="text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-blue-600 underline cursor-pointer">F001-000044</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">15/06/2023 - 09:48 AM</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">DNI - 76543210</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 128.50</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Pagado</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                        <button class="text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 text-sm font-medium text-blue-600 underline cursor-pointer">F001-000043</td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">14/06/2023 - 04:32 PM</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">Cliente ocasional</td>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900">S/ 42.30</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Pagado</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                        <button class="text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-gray-700">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Content -->
+            <div id="inventoryContent" class="p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="flex items-center bg-white rounded-lg shadow p-4">
+                        <div class="bg-blue-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-cubes text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Productos en stock</p>
+                            <p class="text-2xl font-bold">487</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center bg-white rounded-lg shadow p-4">
+                        <div class="bg-orange-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-calendar-alt text-orange-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Próximos a vencer</p>
+                            <p class="text-2xl font-bold text-orange-500">12</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center bg-white rounded-lg shadow p-4">
+                        <div class="bg-red-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Stock mínimo</p>
+                            <p class="text-2xl font-bold text-red-500">8</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-lg">Gestión de Inventario</h3>
+                        <div class="flex space-x-2">
+                            <button id="newEntryBtn" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                <i class="fas fa-plus mr-1"></i> Nueva Entrada
+                            </button>
+                            <button id="adjustStockBtn" class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200">
+                                <i class="fas fa-exchange-alt mr-1"></i> Ajustar Inventario
+                            </button>
+                            <button id="exportInventoryBtn" class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200">
+                                <i class="fas fa-file-export mr-1"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex flex-wrap mb-4">
+                            <div class="w-full md:w-auto md:flex-1 md:mr-2 mb-2 md:mb-0">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por</label>
+                                <select class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>Todos los productos</option>
+                                    <option>Próximos a vencer</option>
+                                    <option>Stock mínimo</option>
+                                    <option>Ofertas</option>
+                                </select>
+                            </div>
+                            <div class="w-full md:w-auto md:flex-1 md:mr-2 mb-2 md:mb-0">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                                <select class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>Todas las categorías</option>
+                                    <option>Analgésicos</option>
+                                    <option>Antibióticos</option>
+                                    <option>Antigripales</option>
+                                    <option>Cuidado personal</option>
+                                </select>
+                            </div>
+                            <div class="w-full md:w-auto">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                                <div class="relative">
+                                    <input type="text" placeholder="Nombre o código" class="border rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mínimo</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vence</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                            <img src="https://placehold.co/40x40" alt="Paracetamol 500mg - Blister con pastillas" class="h-8 w-8 rounded-full mr-2">
+                                            <div>
+                                                Paracetamol 500mg
+                                                <p class="text-xs text-gray-500">7891234567890</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">Analgésico</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900 font-medium">52</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">20</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">L23456</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">15/08/2024</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-barcode"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                            <img src="https://placehold.co/40x40" alt="Ibuprofeno 400mg - Caja con blisters" class="h-8 w-8 rounded-full mr-2">
+                                            <div>
+                                                Ibuprofeno 400mg
+                                                <p class="text-xs text-gray-500">7899876543210</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">Analgésico</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900 font-medium">15</td>
+                                        <td class="px-4 py-2 text-sm text-orange-500 font-medium">25</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">L78901</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">10/12/2024</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-barcode"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                            <img src="https://placehold.co/40x40" alt="Amoxicilina 500mg - Frasco con cápsulas" class="h-8 w-8 rounded-full mr-2">
+                                            <div>
+                                                Amoxicilina 500mg
+                                                <p class="text-xs text-gray-500">7894561239870</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">Antibiótico</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900 font-medium">38</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">15</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">L34567</td>
+                                        <td class="px-4 py-2 text-sm text-orange-500 font-medium">25/07/2023</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-barcode"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                            <img src="https://placehold.co/40x40" alt="Jabón Antibacterial - Botella verde con líquido" class="h-8 w-8 rounded-full mr-2">
+                                            <div>
+                                                Jabón Antibacterial
+                                                <p class="text-xs text-gray-500">7893216549870</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">Higiene</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900 font-medium">24</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">10</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">L45678</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500">05/01/2025</td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-barcode"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Content -->
+            <div id="productsContent" class="p-6 hidden">
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-lg">Catálogo de Productos</h3>
+                        <button id="newProductBtn" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            <i class="fas fa-plus mr-1"></i> Nuevo Producto
+                        </button>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <div class="relative">
+                                <input type="text" placeholder="Buscar producto..." class="border rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Product Card 1 -->
+                            <div class="product-card bg-white rounded-lg shadow p-4 border border-gray-200 transition duration-300">
+                                <div class="flex justify-center mb-3">
+                                    <img src="https://placehold.co/150x150" alt="Paracetamol 500mg - Blister plateado con pastillas blancas" class="h-32 w-32 object-contain">
+                                </div>
+                                <div class="mb-3">
+                                    <h4 class="font-semibold text-gray-800">Paracetamol 500mg</h4>
+                                    <p class="text-xs text-gray-500">Analgésico y antipirético</p>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio:</span>
+                                    <span class="font-semibold text-blue-600">S/ 8.90</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm text-gray-600">Stock:</span>
+                                    <span class="font-semibold">52</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                                        <i class="fas fa-edit mr-1"></i> Editar
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700 text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i> Detalles
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Card 2 -->
+                            <div class="product-card bg-white rounded-lg shadow p-4 border border-gray-200 transition duration-300">
+                                <div class="flex justify-center mb-3">
+                                    <img src="https://placehold.co/150x150" alt="Ibuprofeno 400mg - Caja azul con blisters" class="h-32 w-32 object-contain">
+                                </div>
+                                <div class="mb-3">
+                                    <h4 class="font-semibold text-gray-800">Ibuprofeno 400mg</h4>
+                                    <p class="text-xs text-gray-500">Antiinflamatorio no esteroideo</p>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio:</span>
+                                    <span class="font-semibold text-blue-600">S/ 12.50</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm text-gray-600">Stock:</span>
+                                    <span class="font-semibold text-orange-500">15</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                                        <i class="fas fa-edit mr-1"></i> Editar
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700 text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i> Detalles
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Card 3 -->
+                            <div class="product-card bg-white rounded-lg shadow p-4 border border-gray-200 transition duration-300">
+                                <div class="flex justify-center mb-3">
+                                    <img src="https://placehold.co/150x150" alt="Amoxicilina 500mg - Frasco ámbar con polvo" class="h-32 w-32 object-contain">
+                                </div>
+                                <div class="mb-3">
+                                    <h4 class="font-semibold text-gray-800">Amoxicilina 500mg</h4>
+                                    <p class="text-xs text-gray-500">Antibiótico de amplio espectro</p>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio:</span>
+                                    <span class="font-semibold text-blue-600">S/ 25.00</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm text-gray-600">Stock:</span>
+                                    <span class="font-semibold">38</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                                        <i class="fas fa-edit mr-1"></i> Editar
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700 text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i> Detalles
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Card 4 -->
+                            <div class="product-card bg-white rounded-lg shadow p-4 border border-gray-200 transition duration-300">
+                                <div class="flex justify-center mb-3">
+                                    <img src="https://placehold.co/150x150" alt="Jabón Antibacterial - Botella verde con dispensador" class="h-32 w-32 object-contain">
+                                </div>
+                                <div class="mb-3">
+                                    <h4 class="font-semibold text-gray-800">Jabón Antibacterial</h4>
+                                    <p class="text-xs text-gray-500">250ml con triclosán</p>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-600">Precio:</span>
+                                    <span class="font-semibold text-blue-600">S/ 15.90</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm text-gray-600">Stock:</span>
+                                    <span class="font-semibold">24</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                                        <i class="fas fa-edit mr-1"></i> Editar
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700 text-sm">
+                                        <i class="fas fa-info-circle mr-1"></i> Detalles
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Content -->
+            <div id="reportsContent" class="p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-chart-line text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Reporte de Ventas</h4>
+                                <p class="text-xs text-gray-500">Generar por periodo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-boxes text-green-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Margen de Utilidad</h4>
+                                <p class="text-xs text-gray-500">Por categoría/producto</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-user-md text-purple-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Recetas Médicas</h4>
+                                <p class="text-xs text-gray-500">Reporte por profesional</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Estadísticas de Ventas</h3>
+                        <div class="flex">
+                            <select class="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option>Últimos 7 días</option>
+                                <option>Últimos 30 días</option>
+                                <option>Este mes</option>
+                                <option>Personalizado</option>
+                            </select>
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                <i class="fas fa-download mr-1"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="h-64">
+                            <!-- Chart placeholder -->
+                            <div class="flex items-center justify-center h-full">
+                                <div class="text-center">
+                                    <img src="https://placehold.co/600x300" alt="Gráfico de ventas semanales - Líneas azules mostrando crecimiento" class="mx-auto mb-2">
+                                    <p class="text-sm text-gray-500">Gráfico de ventas por día</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Productos más vendidos</h3>
+                        <div class="flex">
+                            <select class="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option>Por cantidad</option>
+                                <option>Por ingresos</option>
+                                <option>Por margen</option>
+                            </select>
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                <i class="fas fa-print mr-1"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ventas</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ingresos</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Margen</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Paracetamol 500mg - Blister con pastillas" class="h-8 w-8 rounded-full mr-2">
+                                        <span>Paracetamol 500mg</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">7891234567890</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">124</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">S/ 1,103.60</td>
+                                    <td class="px-4 py-2 text-sm text-green-600 font-medium">42%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Ibuprofeno 400mg - Caja con blisters" class="h-8 w-8 rounded-full mr-2">
+                                        <span>Ibuprofeno 400mg</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">7899876543210</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">89</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">S/ 1,112.50</td>
+                                    <td class="px-4 py-2 text-sm text-green-600 font-medium">38%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 text-sm font-medium text-gray-900 flex items-center">
+                                        <img src="https://placehold.co/40x40" alt="Jarabe para la tos - Frasco ámbar con líquido rojo" class="h-8 w-8 rounded-full mr-2">
+                                        <span>Jarabe para la Tos</span>
+                                    </td>
+                                    <td class="px-4 py-2 text-sm text-gray-500">7894561239871</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">47</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900 font-medium">S/ 1,127.00</td>
+                                    <td class="px-4 py-2 text-sm text-green-600 font-medium">45%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescriptions Content -->
+            <div id="prescriptionsContent" class="p-6 hidden">
+                <div class="bg-white rounded-lg shadow mb-6">
+                    <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                        <h3 class="font-semibold text-lg">Gestión de Recetas Médicas</h3>
+                        <button id="newPrescriptionBtn" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            <i class="fas fa-plus mr-1"></i> Nueva Receta
+                        </button>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex flex-wrap mb-4">
+                            <div class="w-full md:w-auto md:flex-1 md:mr-2 mb-2 md:mb-0">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por paciente</label>
+                                <input type="text" placeholder="Nombre o DNI" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="w-full md:w-auto md:flex-1 md:mr-2 mb-2 md:mb-0">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por médico</label>
+                                <input type="text" placeholder="Nombre o CMP" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="w-full md:w-auto">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                                <input type="date" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paciente</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médico</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm text-gray-500">15/06/2023</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">Pérez Torres, Juan</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900">Dra. Laura Mendoza (CMP 12345)</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Atendida</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="text-purple-500 hover:text-purple-700">
+                                                <i class="fas fa-file-prescription"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm text-gray-500">14/06/2023</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">Gonzales López, María</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900">Dr. Carlos Ruiz (CMP 54321)</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Atendida</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="text-purple-500 hover:text-purple-700">
+                                                <i class="fas fa-file-prescription"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-sm text-gray-500">12/06/2023</td>
+                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">Vargas Ramírez, Pedro</td>
+                                        <td class="px-4 py-2 text-sm text-gray-900">Dra. Patricia Díaz (CMP 67890)</td>
+                                        <td class="px-4 py-2 text-sm">
+                                            <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">Pendiente</span>
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-500 flex space-x-2">
+                                            <button class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-gray-700">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="text-purple-500 hover:text-purple-700">
+                                                <i class="fas fa-file-prescription"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Product Expiry -->
+    <div id="expiryModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Productos próximos a vencer</h3>
+                <button id="closeExpiryModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vence</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Días restantes</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-900">Aspirina 100mg</td>
+                            <td class="px-4 py-2 text-sm text-gray-500">L23456</td>
+                            <td class="px-4 py-2 text-sm text-red-600">15/07/2023</td>
+                            <td class="px-4 py-2 text-sm text-red-600">30 días</td>
+                            <td class="px-4 py-2 text-sm text-gray-900">25</td>
+                            <td class="px-4 py-2 text-sm text-gray-500">
+                                <button class="text-blue-500 hover:text-blue-700 mr-2">
+                                    <i class="fas fa-tags"></i> Oferta
+                                </button>
+                                <button class="text-green-500 hover:text-green-700">
+                                    <i class="fas fa-exchange-alt"></i> Intercambiar
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-900">Amoxicilina 500mg</td>
+                            <td class="px-4 py-2 text-sm text-gray-500">L98765</td>
+                            <td class="px-4 py-2 text-sm text-orange-500">22/07/2023</td>
+                            <td class="px-4 py-2 text-sm text-orange-500">37 días</td>
+                            <td class="px-4 py-2 text-sm text-gray-900">15</td>
+                            <td class="px-4 py-2 text-sm text-gray-500">
+                                <button class="text-blue-500 hover:text-blue-700 mr-2">
+                                    <i class="fas fa-tags"></i> Oferta
+                                </button>
+                                <button class="text-green-500 hover:text-green-700">
+                                    <i class="fas fa-exchange-alt"></i> Intercambiar
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-2 text-sm font-medium text-gray-900">Jarabe para la Tos</td
